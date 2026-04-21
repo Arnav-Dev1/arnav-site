@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reflex Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<nav>
+    <a href="index.html">Home</a>
+</nav>
+
+<h1>⚡ Reflex Training</h1>
+
+<!-- 🎯 CIRCLE GAME -->
+<div class="card">
+   
+ <h2>🎯 Click Reflex Game</h2>
+
+
+<h3>Difficulty:</h3>
+<button onclick="setDifficulty('easy')">Easy</button>
+<button onclick="setDifficulty('medium')">Medium</button>
+<button onclick="setDifficulty('hard')">Hard</button>
+<button onclick="setDifficulty('impossible')">Impossible</button>
+
+<h3>Time Left: <span id="time">10</span>s</h3>
+
+<p>Score: <span id="score">0</span></p>
+
+<div id="gameArea">
+    <div id="circle"></div>
+</div>
+
+<h2>⌨️ Typing Speed Trainer</h2>
+
+<h3>Time Left: <span id="typeTime">15</span>s</h3>
+
+<p id="word">start</p>
+
+<input type="text" id="input" placeholder="Type here..." oninput="checkWord()">
+
+<p>Score: <span id="typeScore">0</span></p>
+<p>WPM: <span id="wpm">0</span></p>
+
+
+<style>
+#gameArea {
+    width: 400px;
+    height: 250px;
+    background: #0f172a;
+    margin: 20px auto;
+    position: relative;
+    border: 2px solid white;
+    overflow: hidden;
+}
+
+#circle {
+    width: 80px;
+    height: 80px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    cursor: pointer;
+}
+</style>
+
+<script>
+let score = 0;
+let timeLeft = 10;
+let size = 80;
+let speed = 1000;
+let gameRunning = false;
+
+const circle = document.getElementById("circle");
+const gameArea = document.getElementById("gameArea");
+
+// 🎚 Difficulty
+function setDifficulty(level) {
+    if(level === "easy") {
+        size = 100;
+        speed = 1200;
+    }
+    if(level === "medium") {
+        size = 80;
+        speed = 900;
+    }
+    if(level === "hard") {
+        size = 60;
+        speed = 600;
+    }
+    if(level === "impossible") {
+        size = 40;
+        speed = 400;
+    }
+
+    circle.style.width = size + "px";
+    circle.style.height = size + "px";
+
+    startGame();
+}
+
+// 🚀 Start Game
+function startGame() {
+    score = 0;
+    timeLeft = 10;
+    gameRunning = true;
+
+    document.getElementById("score").innerText = score;
+    document.getElementById("time").innerText = timeLeft;
+
+    moveCircle();
+
+    let moveInterval = setInterval(moveCircle, speed);
+
+    let timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("time").innerText = timeLeft;
+
+        if(timeLeft <= 0) {
+            clearInterval(timer);
+            clearInterval(moveInterval);
+            gameRunning = false;
+            alert("Game Over! Score: " + score);
+        }
+    }, 1000);
+}
+
+// 🎯 Move circle inside box
+function moveCircle() {
+    if(!gameRunning) return;
+
+    let maxX = gameArea.clientWidth - circle.clientWidth;
+    let maxY = gameArea.clientHeight - circle.clientHeight;
+
+    let x = Math.random() * maxX;
+    let y = Math.random() * maxY;
+
+    circle.style.left = x + "px";
+    circle.style.top = y + "px";
+}
+
+// 🖱 Click logic
+circle.onclick = function() {
+    if(!gameRunning) return;
+
+    score++;
+    document.getElementById("score").innerText = score;
+};
+
+// ⌨️ Typing Game
+let words = ["fast", "brain", "speed", "focus", "click", "train", "sharp", "quick"];
+let current = 0;
+let typeScore = 0;
+let typeTime = 15;
+let typingRunning = false;
+
+// start typing game automatically when user types
+function startTypingGame() {
+    if(typingRunning) return;
+
+    typingRunning = true;
+
+    let timer = setInterval(() => {
+        typeTime--;
+        document.getElementById("typeTime").innerText = typeTime;
+
+        if(typeTime <= 0) {
+            clearInterval(timer);
+            typingRunning = false;
+
+            let wpm = Math.round(typeScore * (60 / 15));
+            document.getElementById("wpm").innerText = wpm;
+
+            alert("Time's up! Score: " + typeScore + " | WPM: " + wpm);
+        }
+    }, 1000);
+}
+
+function newWord() {
+    current = Math.floor(Math.random() * words.length);
+    document.getElementById("word").innerText = words[current];
+}
+
+function checkWord() {
+    startTypingGame();
+
+    let input = document.getElementById("input").value;
+
+    if(input === words[current]) {
+        typeScore++;
+        document.getElementById("typeScore").innerText = typeScore;
+        document.getElementById("input").value = "";
+        newWord();
+    }
+}
+
+newWord();
+</script>
+</body>
+</html>
